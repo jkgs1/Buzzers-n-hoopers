@@ -1,0 +1,28 @@
+services:
+  web:
+    build: .
+    volumes:
+      - ./.docker/settings-compose.py:/app/buzzers_n_hoopers/settings.py
+      - ./instance/media:/app/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - cache
+  db:
+    image: mariadb
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: '1'
+      MARIADB_DATABASE: buzzers
+      MARIADB_USER: hoopers
+      MARIADB_PASSWORD: balls
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./instance/db:/var/lib/mysql
+  cache:
+    image: eqalpha/keydb
+    volumes:
+      - ./instance/cache:/data
+    ports:
+      - "6379:6379"
