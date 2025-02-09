@@ -29,6 +29,9 @@ class Team(models.Model):
     description = models.TextField(blank=True, default="")
     players = models.ManyToManyField(Player, through=TeamPlayer)
 
+    def __str__(self):
+        return str(self.name)
+
 class Shirt(models.Model):
     name = models.CharField(max_length=64)
     col = ColorField()

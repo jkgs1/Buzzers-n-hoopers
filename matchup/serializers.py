@@ -2,6 +2,7 @@ from matchup.models import *
 from rest_framework import serializers
 
 class MatchSerializer(serializers.ModelSerializer):
+    full_title = serializers.CharField(source='printer', read_only=True)
     class Meta:
         model = Match
         fields = '__all__'
