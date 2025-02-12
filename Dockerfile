@@ -16,3 +16,4 @@ COPY matchup ./matchup
 EXPOSE 8000
 
 ENTRYPOINT ["/bin/ash", "/app/entrypoint.sh"]
+CMD ["-b", "0.0.0.0:8000"]
