@@ -12,6 +12,6 @@ from rest_framework.authtoken import views
 
 app_name = 'common'
 urlpatterns = [
-    path('auth/', views.obtain_auth_token)
+    path('auth/', views.obtain_auth_token),
     path('', include(router.urls))
 ]
