@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'colorfield',
     'drf_redesign',
     'rest_framework',
+    'rest_framework.authtoken',
     'guardian',
 
     # Our apps
@@ -107,5 +108,9 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ]
 }
