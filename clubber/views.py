@@ -7,20 +7,36 @@ from .serializers import PlayerSerializer, TeamPlayerSerializer, TeamSerializer,
 
 # Create your views here.
 class PlayerViewSet(viewsets.ModelViewSet):
-    queryset = Player.objects.all()
     serializer_class = PlayerSerializer
-
-class TeamPlayerViewSet(viewsets.ModelViewSet):
-    queryset = TeamPlayer.objects.all()
-    serializer_class = TeamPlayerSerializer
+    queryset = Player.objects.all()
 
 class TeamViewSet(viewsets.ModelViewSet):
-    queryset = Team.objects.all()
     serializer_class = TeamSerializer
 
+    def get_queryset(self):
+        if self.kwargs.get('club_pk'):
+            return Team.objects.filter(club=self.kwargs['club_pk'])
+        else:
+            return Team.objects.all()
+
+class TeamPlayerViewSet(viewsets.ModelViewSet):
+    serializer_class = TeamPlayerSerializer
+
+    def get_queryset(self):
+        if self.kwargs.get('team_pk'):
+            return TeamPlayer.objects.filter(team=self.kwargs['team_pk'])
+        else:
+            return TeamPlayer.objects.all()
+
+
 class ShirtViewSet(viewsets.ModelViewSet):
-    queryset = Shirt.objects.all()
     serializer_class = ShirtSerializer
+
+    def get_queryset(self):
+        if self.kwargs.get('team_pk'):
+            return Shirt.objects.filter(team=self.kwargs['team_pk'])
+        else:
+            return Shirt.objects.all()
 
 class ClubViewSet(viewsets.ModelViewSet):
     queryset = Club.objects.all()
