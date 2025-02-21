@@ -22,6 +22,13 @@ class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
 
+    def post(self, request, format=None):
+        serializer = MatchSerializer(data=request.data)
+        if serializer.is_valid():
+            obj = serializer.save()
+            return Response(obj.id, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=True, methods=['get'])
     def pdf_gen(self, request, pk=None):
         match = self.get_object()
