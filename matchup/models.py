@@ -13,12 +13,14 @@ class Match(models.Model):
     homeTeamId = models.ForeignKey(Team, related_name='homeId', null=False, on_delete=models.CASCADE)
     awayTeamId = models.ForeignKey(Team, related_name='awayId', null=False, on_delete=models.CASCADE)
     startTime = models.DateTimeField(auto_now_add=True)
+    clockPaused = models.BooleanField(default=True, editable=False)
+    timePaused = models.DateTimeField(editable=False)
 
 
 class Event(models.Model):
     match = models.ForeignKey(Match, null=False, blank=False, on_delete=models.CASCADE)
-    player1 = models.ForeignKey("MatchPlayer", related_name='p1', on_delete=models.CASCADE)
-    player2 = models.ForeignKey("MatchPlayer", related_name='p2', on_delete=models.CASCADE)
+    player1 = models.ForeignKey("MatchPlayer", blank=True , null=True, related_name='p1', on_delete=models.CASCADE)
+    player2 = models.ForeignKey("MatchPlayer", blank=True , null=True, related_name='p2', on_delete=models.CASCADE)
     time = models.TimeField(auto_now_add=True)
     EVENT_TYPE = [
         ("1P", "1 Point"),
@@ -27,7 +29,11 @@ class Event(models.Model):
         ("FP", "Personal foul"),
         ("FO", "Other foul"),
         ("EX", "Exchange"),
-        ("TO", "Timeout")
+        ("TO", "Timeout"),
+        ("MS", "Match start"),
+        ("CP", "Clock pause"),
+        ("CR", "Clock resume")
+        
     ]
 
     event_type = models.CharField(null=False, blank=False, max_length=2, choices=EVENT_TYPE)

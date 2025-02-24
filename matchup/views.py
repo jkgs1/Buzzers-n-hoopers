@@ -1,14 +1,13 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 from django.http import HttpResponse
+from django.http import JsonResponse
 from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from django.db.models import Count
 from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from .models import *
 from .serializers import *
-import sys
+import logging
+from datetime import datetime
 
 import io
 from django.http import FileResponse
@@ -22,13 +21,40 @@ class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
 
+    def toggle_match_clock(match):
+        if match.clockPaused:
+            match.clockPaused = False
+        else:
+            match.timePaused = timezone.now()
+            match.clockPaused = True
+        match.save()
+
     def post(self, request, format=None):
+        logger = logging.getLogger(__name__)
+        logger.critical("cock")
         serializer = MatchSerializer(data=request.data)
         if serializer.is_valid():
             obj = serializer.save()
             return Response(obj.id, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    
+    @action(detail=True, methods=['get'])
+    def get_match_clock(self, request, pk=None):
+        
+        match = self.get_object()
+        
+        current_time = timezone.now()
+        paused_interval = current_time  - match.timePaused
+        time_diff = current_time  - match.startTime - paused_interval
+        minutes = time_diff.seconds // 60
+        seconds = time_diff.seconds % 60
+        result = {"minutes":minutes, "seconds":seconds}
+        if match.clockPaused:
+            return JsonResponse({"minutes":"paused", "seconds":"paused"})
+        return JsonResponse(result)
+        
+    
     @action(detail=True, methods=['get'])
     def pdf_gen(self, request, pk=None):
         match = self.get_object()
@@ -112,6 +138,22 @@ class MatchViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+
+    # checks if new event updates the match clock and performs relevant updates
+    def clock_update(event):
+        et = event.event_type
+        if et == "MS" or et == "CS" or et == "CR":
+            event.match.toggle_match_clock(event.match)
+        
+    
+    def post(self, request, format=None):
+        event = self.get_object()
+        serializer = EventSerializer(data=request.data)
+        if serializer.is_valid():
+            obj = serializer.save()
+            clock_update(event)              
+            return Response(obj.id, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class MatchPlayerViewSet(viewsets.ModelViewSet):

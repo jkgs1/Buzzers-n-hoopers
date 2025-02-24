@@ -21,3 +21,6 @@ class MatchAdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = MatchAdmin
         fields = '__all__'
+
+class MatchClockSerializer(serializers.Serializer):
+    match_clock = serializers.TimeField()
