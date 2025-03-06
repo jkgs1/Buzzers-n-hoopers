@@ -20,15 +20,9 @@ from rest_framework.decorators import action
 class MatchViewSet(viewsets.ModelViewSet):
     queryset = Match.objects.all()
     serializer_class = MatchSerializer
-
-    def toggle_match_clock(match):
-        if match.clockPaused:
-            match.clockPaused = False
-        else:
-            match.timePaused = timezone.now()
-            match.clockPaused = True
-        match.save()
-
+    clockPaused = True    
+    
+    
     def post(self, request, format=None):
         logger = logging.getLogger(__name__)
         logger.critical("cock")
@@ -50,7 +44,7 @@ class MatchViewSet(viewsets.ModelViewSet):
         minutes = time_diff.seconds // 60
         seconds = time_diff.seconds % 60
         result = {"minutes":minutes, "seconds":seconds}
-        if match.clockPaused:
+        if clockPaused:
             return JsonResponse({"minutes":"paused", "seconds":"paused"})
         return JsonResponse(result)
         

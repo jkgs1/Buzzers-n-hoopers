@@ -13,8 +13,6 @@ class Match(models.Model):
     homeTeamId = models.ForeignKey(Team, related_name='homeId', null=False, on_delete=models.CASCADE)
     awayTeamId = models.ForeignKey(Team, related_name='awayId', null=False, on_delete=models.CASCADE)
     startTime = models.DateTimeField(auto_now_add=True)
-    clockPaused = models.BooleanField(default=True, editable=False)
-    timePaused = models.DateTimeField(editable=False)
 
 
 class Event(models.Model):
