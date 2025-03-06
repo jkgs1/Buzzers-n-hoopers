@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 from django.http import HttpResponse
+from django.http import JsonResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from django.db.models import Count
@@ -28,6 +29,31 @@ class MatchViewSet(viewsets.ModelViewSet):
             obj = serializer.save()
             return Response(obj.id, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def get_home_score (self, request, pk=None):
+        match = self.get_object()
+        players = match.matchplayer_set.filter(team = match.homeTeamId)
+        points = 0
+        for p in players:
+            points += (1 * match.event_set.filter(player1=p, event_type="1P").count()) + (
+                        2 * match.event_set.filter(player1=p, event_type="2P").count()) + (
+                        3 * match.event_set.filter(player1=p, event_type="3P").count())
+        result = {"home_score":points}
+        return JsonResponse(result)
+    
+    @action(detail=True, methods=['get'])
+    def get_away_score (self, request, pk=None):
+        match = self.get_object()
+        players = match.matchplayer_set.filter(team = match.awayTeamId)
+        points = 0
+        for p in players:
+            points += (1 * match.event_set.filter(player1=p, event_type="1P").count()) + (
+                        2 * match.event_set.filter(player1=p, event_type="2P").count()) + (
+                        3 * match.event_set.filter(player1=p, event_type="3P").count())
+        result = {"away_score":points}
+        return JsonResponse(result)
+        
 
     @action(detail=True, methods=['get'])
     def pdf_gen(self, request, pk=None):
