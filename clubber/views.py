@@ -1,6 +1,4 @@
-from django.shortcuts import render
 from rest_framework import viewsets
-from rest_framework_guardian import filters
 
 from common.permissions import ObjectPermissions
 from .models import Player, TeamPlayer, Team, Shirt, Club
@@ -13,7 +11,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
 
     permission_classes = [ObjectPermissions]
-    filter_backends = [filters.ObjectPermissionsFilter]
+    filter_backends = []
 
 class TeamViewSet(viewsets.ModelViewSet):
     serializer_class = TeamSerializer
@@ -25,7 +23,7 @@ class TeamViewSet(viewsets.ModelViewSet):
             return Team.objects.all()
 
     permission_classes = [ObjectPermissions]
-    filter_backends = [filters.ObjectPermissionsFilter]
+    filter_backends = []
 
 class TeamPlayerViewSet(viewsets.ModelViewSet):
     serializer_class = TeamPlayerSerializer
@@ -37,7 +35,7 @@ class TeamPlayerViewSet(viewsets.ModelViewSet):
             return TeamPlayer.objects.all()
 
     permission_classes = [ObjectPermissions]
-    filter_backends = [filters.ObjectPermissionsFilter]
+    filter_backends = []
 
 
 class ShirtViewSet(viewsets.ModelViewSet):
@@ -50,11 +48,11 @@ class ShirtViewSet(viewsets.ModelViewSet):
             return Shirt.objects.all()
 
     permission_classes = [ObjectPermissions]
-    filter_backends = [filters.ObjectPermissionsFilter]
+    filter_backends = []
 
 class ClubViewSet(viewsets.ModelViewSet):
     queryset = Club.objects.all()
     serializer_class = ClubSerializer
 
     permission_classes = [ObjectPermissions]
-    filter_backends = [filters.ObjectPermissionsFilter]
+    filter_backends = []

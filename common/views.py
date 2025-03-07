@@ -1,6 +1,10 @@
-from django.contrib.auth.models import Group, Permission
-from django.shortcuts import render
+from django.contrib.auth.models import Group, Permission, AnonymousUser
+from guardian.utils import get_anonymous_user
 from rest_framework import viewsets
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 from rest_framework_guardian import filters
 
 from common.models import User
@@ -29,3 +33,13 @@ class PermissionViewSet(viewsets.ModelViewSet):
 
     permission_classes = [ObjectPermissions]
     filter_backends = [filters.ObjectPermissionsFilter]
+
+
+class ObtainAuthOrAnonToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        # If empty post sent, return an anonymous user token
+        if not request.data:
+            token, created = Token.objects.get_or_create(user=get_anonymous_user())
+            return Response({'token': token.key})
+        else:
+            return super().post(request, *args, **kwargs)
