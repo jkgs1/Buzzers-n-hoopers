@@ -1,4 +1,5 @@
 from colorfield.fields import ColorField
+from django.contrib.auth.models import Group
 from django.db import models
 from common.models import User
 
@@ -15,12 +16,19 @@ class Club(models.Model):
     name = models.CharField(max_length=64)
     logo = models.ImageField(blank=True, null=True)
     description = models.TextField(blank=True, default="")
+    aclGroup = models.OneToOneField(Group, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 class TeamPlayer(models.Model):
     team = models.ForeignKey("Team", on_delete=models.CASCADE)
     player = models.ForeignKey("Player", on_delete=models.CASCADE)
     shirt = models.OneToOneField("Shirt", on_delete=models.CASCADE)
     number = models.IntegerField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.team.name} | {self.player}'
 
 class Team(models.Model):
     name = models.CharField(max_length=64)
@@ -30,7 +38,7 @@ class Team(models.Model):
     players = models.ManyToManyField(Player, through=TeamPlayer)
 
     def __str__(self):
-        return str(self.name)
+        return f'{self.name}'
 
 class Shirt(models.Model):
     name = models.CharField(max_length=64)
